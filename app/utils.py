@@ -5,6 +5,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 import pickle
 import sys
+import re
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 data = pickle.load(open(sys.path[0] + '/models/data.pkl', 'rb'))
@@ -153,6 +154,9 @@ class SimpleTokenizer:
         output['input_ids'] = []
         output['attention_mask'] = []
         for sentence in sentences:
+            sentence = [x.lower() for x in sentence] #lower case
+            sentence = [re.sub("[.,!?\\-]", '', x) for x in sentence]
+            sentence = " ".join(sentence) #clean all symbols
             input_ids = [self.word2id.get(word, self.word2id['[UNK]']) for word in sentence.split()]
             n_pad = self.max_len - len(input_ids)
             input_ids.extend([0] * n_pad)
@@ -199,6 +203,7 @@ def mean_pool(token_embeds, attention_mask):
     return pool
 
 def calculate_similarity(model, tokenizer, sentence_a, sentence_b, device):
+    model.eval()
     # Tokenize and convert sentences to input IDs and attention masks
     inputs_a = tokenizer.encode(sentence_a)
     inputs_b = tokenizer.encode(sentence_b)

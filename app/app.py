@@ -31,7 +31,7 @@ def index():
     if request.method == 'POST':        
         sentence_a = request.form.get('sen1')
         sentence_b = request.form.get('sen2')
-        print(sentence_a, sentence_b)
+        # print(sentence_a, sentence_b)
         result = calculate_similarity(model, tokenizer, sentence_a, sentence_b, device)
         return render_template('index.html', result=result, sen1 = sentence_a, sen2 = sentence_b)
 
